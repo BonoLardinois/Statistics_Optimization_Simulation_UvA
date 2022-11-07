@@ -1,0 +1,302 @@
+---
+title: "Assignment 2 - Group 4"
+author: "Katrin Grunert, Carmen Byrne Salsas, Bono Lardinois"
+date: "14 October 2022"
+output:
+  html_document:
+    df_print: paged
+fontsize: 11pt
+highlight: tango
+---
+
+`r sat = read.table("sat.txt",header=TRUE)`
+`r tree = read.table("treeVolume.txt",header=TRUE)`
+
+# Exercise 2.1
+
+## Exercise 2.1.a
+
+Step-up method:
+0 - selects variable from list of possible predictors and add to baseline model
+1 - choose the predictor yielding p-value \leq 0.05 and the highest R-squared  \newline
+2 - add this variable to the model from the previous iteration to create a new baseline model \newline
+3 - remove this variable from the list of possible predictors \newline
+4 - return to step 0). \newline
+
+
+
+We can see that "takers" is significant; therefore, we should keep it and check whether the next independent variable is significant. If we add "expend" on top of "takers", the new independent variable is also significant; hence, we keep it. However, when we add "ratio" or "salary" on top of the model with "takers" and "expend", we see that "ratio" is not significant. 
+
+Hence, the final model is "total~takers + expend" with resulting $R^2$ 0.82 and residual standard error 32.46.
+
+```{r,echo=FALSE,fig.height=3.5}
+summary(lm(total~takers, data = sat)) 
+summary(lm(total~expend, data = sat))
+summary(lm(total~ratio, data = sat))
+summary(lm(total~salary, data = sat))
+#takers yields the largest R2 increase and is significant
+
+
+summary(lm(total~takers + expend, data = sat))
+summary(lm(total~takers + ratio, data = sat)) 
+summary(lm(total~takers + salary, data = sat)) 
+#expend yields the largest R2 increase and is significant
+
+
+
+summary(lm(total~takers + expend + ratio, data = sat))
+summary(lm(total~takers + expend + salary, data = sat))
+#neither ratio nor salary are significant
+
+```
+
+Step-down method:
+1) Use all of the (remaining) variables as independent variables
+2) For those deemed not significant by the t-test (p-val > 0.05), select variable yielding the largest p-value, and remove it from the list of candidate independent variables.
+3) Go back to step 1.
+
+We first fit a model with expend, ratio, salary and takers as independent variables. We can see that among the variables with p-values larger than 0.05, ´expend' yields the largest p-value. Thus we remove ít from the list of independent variables. The resulting model summary shows that all remaining independent variables are significant, yielding the following model: "total~ ratio + salary + takers" with resulting $R^2$ 0.82 and residual standard error 32.41.
+
+
+
+```{r, echo=FALSE}
+model_0 = lm(total ~ expend + ratio + salary + takers , data = sat)
+summary(model_0)
+#largest p-val> 0.05 is for "expend", remove from model
+
+model_1 = lm(total ~  ratio + salary + takers, data = sat)
+summary(model_1)
+#all p-values smaller than 0.05, all these variables are significant
+```
+The step-up and step-down methods yield models with similar $R^2$ and similar residual standard error, with the step-down method yielding a slightly smaller residual standard error. However, the step-down model uses three predictor variables, whereas the step-up model requires only two predictor variables. The small increase of performance does not justify the increase of model complexity; hence, the model obtained with the step-up method is the best; namely: "total~takers + expend"
+
+
+
+## Exercise 2.1.b
+
+The relationship between total SAT and the square of takers does not look linear, which suggests that the square of takers may not be a good candidate as a linear predictor.
+
+```{r, echo=FALSE}
+
+sat$takers2=(sat$takers)^2
+
+plot(sat$total, sat$takers2, main="Distribution of total SAT in terms of the square of takers",
+   xlab="Square of takers", ylab="Total SAT", pch=19)
+
+```
+
+Step-up method
+
+```{r, echo=FALSE}
+#step-up
+
+summary(lm(total~takers2, data = sat))
+summary(lm(total~takers, data = sat)) 
+summary(lm(total~expend, data = sat))
+summary(lm(total~ratio, data = sat))
+summary(lm(total~salary, data = sat))
+#takers yields the largest R2 increase and is significant
+
+
+
+summary(lm(total~takers + expend, data = sat))
+summary(lm(total~takers + ratio, data = sat)) 
+summary(lm(total~takers + salary, data = sat)) 
+summary(lm(total~takers + takers2, data = sat)) 
+#takers2 yields the largest R2 increase and is significant
+
+summary(lm(total~takers + takers2 + expend, data = sat))
+summary(lm(total~takers + takers2 + ratio, data = sat))
+summary(lm(total~takers + takers2 + salary, data = sat))
+#expend yields the largest R2 increase and is significant
+
+summary(lm(total~takers + takers2 + expend + ratio, data = sat))
+summary(lm(total~takers + takers2 + expend + salary, data = sat))
+#neither ratio nor salary are significant
+
+
+#best model total~ takers + takers2 + expend, R2 0.8859, standard error 26.08
+
+```
+
+Step-down method
+```{r, echo=FALSE}
+#step-down
+summary(lm(total~takers + takers2 + expend + ratio + salary, data = sat))
+#salary largest p-value that is greater than 0.05
+
+summary(lm(total~takers + takers2 + expend + ratio, data = sat))
+#ratio largest p-value that is greater than 0.05
+
+summary(lm(total~takers + takers2 + expend, data = sat))
+#all other variables are significant
+
+
+```
+
+The best model is total~ takers + takers2 + expend yielding an $R^2$ of 0.8859, and a residual standard error 26.08 both for step up and step down methods.
+
+## Exercise 2.1.c
+
+Model from 2.2.b achieves a better performance; hence, we will select this one. Adding the variable "takers" and its square introduces the problem of multicolinearity, which makes the isolation of the effects of each predictor variable and their interpretation impossible. This is because it is impossible to increase one unit of "takers" while forcing "takers2" to be fixed. However, we hypothesize that other powers of "takers" may achieve better results as predictors since neither takers or takers2 seem to be completely linearly related to the total SAT score. 
+The R output shows that baseline SAT score is 1052, a SAT score is expected to increase one unit if the mean expenses for a pupil increased by a factor of 8 approximately. 
+
+```{r}
+summary(lm(total~takers + takers2 + expend, data = sat))
+
+```
+
+
+## Exercise 2.1.d
+
+
+```{r}
+best_model <- lm(total ~ takers + takers2 + expend, data = sat)
+t = 25
+t2 = 25^2
+newdata = data.frame("takers" = t, "takers2" = t2, "expend" = 5)
+predict(best_model,newdata = newdata, interval = "prediction")
+predict(best_model, newdata= newdata, interval = "confidence") 
+```
+Prediction: 961.570
+Prediction interval: [907.600, 1015.54]
+Confidence interval: [949.080, 974.061]
+
+# Exercise 2.2
+## Exercise 2.2.a
+
+
+H0: tree type has no effect on volume 
+H1: contribution level of beech $\alpha 1$ \neq contribution level of oak $\alpha 2$
+
+p-value = 0.17 > 0.05 => can't reject H0; hence, tree type does not seem to have a significant effect on the tree volume; therefore, we cannot say that an oak is more voluminous than a beech at a 0.05 significance level. However, the predicted volume for a beech is 30.171 while it is 35.25 for oaks. The volume can be calculated using the function predict, or by looking at the intercept for the baseline Beech volume, and the sum of the intercept and type oak coefficients returned by the summary of the fitted model.
+```{r}
+volumelm = lm(volume ~ type,data=tree)
+anova(volumelm)
+summary(volumelm)
+
+newdata = data.frame("type" = "beech")
+predict(volumelm, newdata = newdata)
+
+newdata2 = data.frame("type" = "oak")
+predict(volumelm, newdata = newdata2)
+``` 
+
+## Exercise 2.2.b
+
+
+H0: Tree type has no effect on tree volume given the tree diameter and height
+H1: Tree type has an effect on tree volume given the tree diameter and height
+
+Since we want to test if tree type has an effect on volume, type goes last in lm command.
+
+```{r}
+volumelm_ancova=lm(volume~height+diameter+type, data=tree)
+anova(volumelm_ancova)
+summary(volumelm_ancova)
+
+
+avg_height = mean(tree$height)
+avg_diam = mean(tree$diameter)
+
+newbeech = data.frame("type" = "beech", "height" = avg_height, "diameter" = avg_diam)
+newoak = data.frame("type" = "oak", "height" = avg_height, "diameter" = avg_diam)
+predict(volumelm_ancova, newdata = newbeech)
+predict(volumelm_ancova, newdata = newoak)
+```
+p-value = 0.143 > 0.05 => can't reject H0; hence, tree type does not seem to have a significant effect on the tree volume given the height and diameter. Given two trees with overall average height and diameter, the volume of a beech is predicted to be 33.200, and for an oak it is predicted to be 31.896.
+
+
+To calculate the effect of diameter on volume we use linear regression and check whether diameter is significant.
+
+```{r}
+volume_diam=lm(volume~diameter, data=tree)
+summary(volume_diam)
+
+```
+We can see that the coefficient for diameter is 4.885 and that diameter is deemed as a significant predictor. Hence, an increase of one unit of diameter yields a volume increase by a factor of 4.885. To see whether this effect is similar for both tree types we can plot the tree volume against the tree diameter and colour the points by tree type. In this scatter plot we cannot clearly identify two clusters of points for each data type, and volume seems to increase with the diameter independently of the tree type; hence, the dependence of volume on the tree diameter seems to be similar for both tree types.
+
+```{r}
+plot(tree$diameter,tree$volume,col=factor(tree$type,labels=c("blue","red")))
+
+```
+
+
+## Exercise 2.2.c
+
+Since a tree can be seen as cylinder, we can estimate its volume by $\pi * radius^2 * height$. The radius is the diameter multiplied by 0.5; therefore, the relationship between $diameter^2$ and the volume should also be significant. 
+
+The first option would be to square the diameter and add it as a predictor together with the height. The second option is to include the product of the square of the diameter and the tree height, note that this model is still considered linear in the regression coefficients. 
+
+
+```{r}
+tree$diameter2 = tree$diameter ^2
+tree$product = tree$diameter2*tree$height
+
+summary(lm(tree$volume ~ tree$diameter2 + tree$height))
+summary(lm(tree$volume ~ tree$product))
+
+```
+
+Note that both of these models achieve a better performance than the model including the non-transformed height and diameter variables and the tree type, and the model including only the tree diameter. Amongst these two models, the model using the product of the height and the square of the tree diameter as predictors achieves the highest $R^2$ and the smallest residual standard error. 
+
+# Exercise 2.3
+## Exercise 2.3.a
+
+Text here
+
+```{r}
+#code here
+```
+
+
+## Exercise 2.3.b
+
+Text here
+
+```{r}
+#code here
+```
+
+
+## Exercise 2.3.c
+
+Text here
+
+```{r}
+#code here
+```
+
+# Exercise 2.4
+## Exercise 2.4.a
+
+Text here
+
+```{r}
+#code here
+```
+
+## Exercise 2.4.b
+
+Text here
+
+```{r}
+#code here
+```
+
+# Exercise 2.5
+## Exercise 2.5.a
+
+Text here
+
+```{r}
+#code here
+```
+
+## Exercise 2.5.b
+
+Text here
+
+```{r}
+#code here
+```

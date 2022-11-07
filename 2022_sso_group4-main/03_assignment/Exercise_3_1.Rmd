@@ -1,0 +1,65 @@
+---
+title: "Exercise_3_1"
+author: "Bono Lardinois"
+date: "10/23/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## 3.1 A
+To solve this single-machine scheduling problem, an integer linear optimization model was created by using PULP. With this model, the most optimal solution was found to complete all ten jobs with the least amount of tardiness. The model has the following decision variables. 
+
+* jobs: the names of jobs available
+* d_i: duration of a certain job
+* r_i: release time of a certain job in hours
+* t_i: due date of a certain job
+* n: number of jobs
+* y_i_j: decision variable, with y_i_j = 1 if job i goes before before job j
+* z_i: tardiness of each job
+
+The model also made use of the following constraints.
+
+1. No overlap: 
+  x~i~ + d~i~ <= x~j~ + 1000 * y~i,j~ (for each i, j. As long i is not j)
+2. Job order: 
+  y~i,j~ + y~j,i~ = 1 (for each i, j. As long i is not j)
+3. release date: 
+  x~i~ >= r~i~ (for each i)
+4. Start and duration times not greater than the due date (tardiness):
+  x~i~ + d~i~ - t~i~ <= z~i~, z~i~~ >= 0 (for each i)
+5. Binary decision variable:
+  $y_{i,j} \in 0,1$, (for all i and j. As long i is not j)
+
+i and j are the number of jobs with a possible integer value of 1 to 10. 
+
+To calculate the optimal solution to this problem:
+$$\sum_{n=1}^{10} c_i * z_i$$
+Here c~i~ is 1, and z~i~ is the tardiness of a job.
+
+After running the model, this gave the following optimal schedule:
+
+| Job order       | 6 | 7 | 9 | 1 | 2 | 3  | 5  | 4  | 8  | 10 |
+|-----------------|---|---|---|---|---|----|----|----|----|----|
+| Start time (x_i) | 0 | 1 | 1 | 3 | 7 | 12 | 15 | 22 | 27 | 30 |
+| Tardiness (z_i)  | 0 | 0 | 0 | 0 | 0 | 0  | 2  | 2  | 0  | 20 |
+
+In this schedule, we start with job 6 and end with job 10. Tasks 5, 4, and 10 will have tardiness with a total of 24 hours. This means that the optimal schedule the machines need an extra 24 hours in order to complete all the jobs.
+
+
+## 3.1 B
+Compared to the problem in exercise, a few things need to change to model the optimal solution. Now Jobs 1, 3, 4, 6, and 10 require a sieve of type 1, whereas jobs 2, 5, 7, 8, and 9 require a sieve of type 2. When jobs come after each other with a different sieve, the extra time it costs to change the sieve is 1 hour. The constraints in this problem were modified with an extra binary decision variable: costs~i,j~. This variable will be 1 if the jobs require a different sieve. Moreover, the constraint of preventing overlap was modified to implement the cost variable correctly. The new no-overlap constraint is now:
+$$x_{i} + d_{i} + cost_{i} <= x{j} + 1000 * y_{i.j}$$
+With this new constraint, the 1 hour of extra time will be added if jobs x~i~ and x~j~ are not in the same groups. This gave a result of a total tardiness of 40 hours. The table with the optimal schedule is presented below:
+
+| Job order       | 9 | 7 | 6 | 1 | 3 | 2  | 5  | 8  | 4  | 10 |
+|-----------------|---|---|---|---|---|----|----|----|----|----|
+| Start time (xi) | 0 | 2 | 3 | 4 | 8 | 12 | 17 | 24 | 28 | 33 |
+| Tardiness (zi)  | 0 | 0 | 0 | 0 | 0 | 5  | 4  | 0  | 8  | 23 |
+
+Compared to the previous schedule, we see a different order and a delay for the following jobs: 6, 2, 4. This means there will be a change of sieve three times. This has changed the order of the most optimized solution and brings 16 additional hours compared to the first schedule without the extra costs of sieve change. 
+
+## Apendix
+![Fig 1: Excel and solver screen-shot (Excersize 2.3 A)](3_1_a.png)
+
+![Fig 1: Excel and solver screen-shot (Excersize 2.3 A)](3_1_b.png)

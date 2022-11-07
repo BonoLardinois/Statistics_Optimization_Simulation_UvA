@@ -1,0 +1,46 @@
+---
+title: "Assignment 3 - Group 4"
+author: "Katrin Grunert (13914103), Carmen Byrne Salsas (12968900), Bono Lardinois (11713364)"
+date: "23 October 2022"
+output:
+  pdf_document: default
+fontsize: 11pt
+highlight: tango
+---
+
+# Exercise 3.2
+
+## Exercise 3.2.a
+
+The project consists out of 7 activities (1,2,3,4,5,6,7) which all have a respective expected duration $d_i = [1,3,2,3,4,5,2], i \in [1,2,3,4,5,6,7]$ 
+
+Their finish times $FT_i$ are formulated according to the dependencies depicted in the assignment description as follows:
+
+1. $FT_1 = d_1$
+1. $FT_2 = d_1 + d_2$
+1. $FT_3 = d_1 + d_3$
+1. $FT_4 = d_1  + d_4$
+1. $FT_5 = max(d_2,d_3) + d_5$
+1. $FT_6 = max(d_3 + d_4) + d_6$
+1. $FT_7 = max(d_5, d_6) + d_7$
+
+
+The activity durations follow an exponential distribution $r(x) = e^{-d_ix}$ and therefore the function  $x = \frac{-ln(u)}{\frac{1}{d_i}}$ was used to simulate new values for each activity, where $u$ is a random sample from a uniform distribution.
+
+This was done 10,000 times in Excel and the sample average (expected project finish time) was 14.081.
+
+## Exercise 3.2.b
+
+Next up we calculate a 95% confidence interval using the sample standard deviation of 6.167, the z-score 1.96 and the sample size of 10,000.
+
+We can say with 95% confidence that the expected finish time lays between the lower and upper bounds of [13.85, 14.09]
+
+## Exercise 3.2.c
+
+The probability that the project takes more than 12 days can be represented as a sample proportion $p$. Therefore we count the occurences where the finishing time is greater than 12 in our 10,000 samples and divide that by the total number of samples.
+
+Doing so, the sample proportion is 0.581.
+
+Knowing the sample proportion, we can construct the 95% confidence interval using the sample standard deviation of 0.494, the z-score of 1.96, and the sample size of 10,000.
+
+We can say with 95% confidence, that the probability for the expected finishing time to be greater than 12 is between the lower and upper bounds of [0.571, 0,591].

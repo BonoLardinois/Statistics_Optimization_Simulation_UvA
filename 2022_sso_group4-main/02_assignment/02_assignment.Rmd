@@ -1,0 +1,179 @@
+---
+title: "Assignment 2 - Group 4"
+author: "Katrin Grunert (13914103), Carmen Byrne Salsas (12968900), Bono Lardinois (11713364)"
+date: "14 October 2022"
+output:
+  pdf_document: default
+fontsize: 11pt
+highlight: tango
+---
+
+```{r,echo=FALSE,fig.height=3.5}
+sat = read.table("sat.txt",header=TRUE)
+tree = read.table("treeVolume.txt",header=TRUE)
+```
+
+# Exercise 2.1
+
+## Exercise 2.1.a
+
+Text here
+
+```{r,echo=FALSE,fig.height=3.5}
+#code here
+```
+
+## Exercise 2.1.b
+
+Text here
+
+```{r, echo=FALSE}
+#code here
+```
+
+## Exercise 2.1.c
+
+Text here
+
+```{r}
+#code here
+```
+## Exercise 2.1.d
+
+Text here
+
+```{r}
+#code here
+```
+
+# Exercise 2.2
+## Exercise 2.2.a
+
+Text here
+```{r}
+#code here
+```
+
+## Exercise 2.2.b
+
+Text here
+
+```{r}
+#code here
+```
+
+## Exercise 2.2.c
+
+Text here
+
+```{r}
+#code here
+```
+
+
+# Exercise 2.3
+## Exercise 2.3.a
+
+The decision variables for this optimization problem are defined as quantities of the following products:
+
+$x_1 = Carrots; x_2 = Potatos; x_3 = Bread; x_4 = Cheese; x_5 = PeanutButter$
+
+Each product has the corresponding nutritional values: $calories_i; fat_i; protein_i; carbs_i$
+These nutritional values are used to define the decision variables below:
+
+1. $(\sum_{i=1}^{n=5} calories_i*x_i ) \geq 2000$
+1. $(\sum_{i=1}^{n=5} fat_i*x_i )  \geq 50$
+1. $(\sum_{i=1}^{n=5} protein_i*x_i )  \geq 250$
+1. $(\sum_{i=1}^{n=5} carbs_i*x_i)  \geq 200$
+
+
+Objective is to minimize the prize:
+
+$min(\sum_{i=1}^{n=5} price_i*x_i)$
+
+The cheapest diet that fulfills these constraints consists out of $7.72$ servings of potatoes and $9.28$ servings of peanut butter, and has a prize of $2.32$ per serving.
+
+
+## Exercise 2.3.b
+
+Increasing the price of peanut butter to 0.25cents after 5 quantities can be formulated as a peanut butter tax of 0.10cents. 
+For that, we first add a binary constraint to the problem definition:
+
+$y = \begin{cases} 1 &\text{ if } x_5 > 5 \\ 0 &\text{ else}  \end{cases}$
+
+And the objective incorporates binary variable $y$ to add a peanut butter tax to the calculation as follows:
+
+$min((\sum_{i=1}^{n=5} price_i*x_i) + 0.1 y(x_5-5))$
+
+Solving this problem in Excel, yields the result that peanut butter is used $5$ times and potatoes $16.62$ times in the cheapest diet that fulfills all nutritional constraints and will costs $2.75$€ per serving. Here we can see, that peanut butter does not become a profitable item once the peanut butter tax has been introduced, but the price increases nevertheless by $0.43$ cents due to the increased use of potatoes in the diet.
+
+## Exercise 2.3.c
+
+Using an ILO model, we add the constraint of using no fractions when calculating the cheapest diet to the existing constraints from 2.3.a.
+The cheapest diet consists out of $9$ servings of potatoes and $9$ servings of peanut butter, and has a prize of $2.43$ per serving. More potatos are now required to compensate for the rounded down amount of peanut butter servings.
+
+# Exercise 2.4
+## Exercise 2.4.a
+
+The transportation problem was solved using a LO Model. The cheapest transportation plan that fulfills all demand and respects available supplies costs 460€
+
+Constraints are defined as:
+
+1. $x_{11} + x_{12} + x_{13} + x_{14} \leq 20$
+1. $x_{21} + x_{22} + x_{23} + x_{24} \leq 25$
+1. $x_{31} + x_{32} + x_{33} + x_{34} \leq 15$
+1. $x_{11} + x_{21} + x_{31} \geq 10$
+1. $x_{12} + x_{22} + x_{32} \geq 15$
+1. $x_{13} + x_{23} + x_{33} \geq 15$
+1. $x_{14} + x_{24} + x_{34} \geq 20$
+1. $x_{ij} \geq 0, i = 1,2,3, j = 1,2,3,4$
+
+Objective is to find the cheapest transportation plan, such that:
+
+$min (10 x_{11} + 0x{12} + 20x{13} + 11x{14} \\ + 12x{21} + 7x{22} + 9x{23} + 20x{24} \\ + 0x{31} + 14x{32} + 16x{33} + 18x{34})$
+
+or 
+
+$min \displaystyle\sum_{i=1}^{n=3} \displaystyle\sum_{j=1}^{m=4} Cost_{ij}* x_{ij}$
+
+
+TODO add quantities (from Solver Report or so)
+
+## Exercise 2.4.b
+
+Each transportation edge has an initial cost of 100. 
+
+For this we will use the same constraints as in 2.4.a plus a decision contraint:
+
+$$
+y_{ij} = 
+\begin{cases} 
+  1 &\text{if } x_{ij} > 0\\
+  0 &\text{else } 
+\end{cases}
+$$
+
+The objective stays also the same but also incorporates the additional cost for transporting goods from a source to a destination.
+
+$min \displaystyle\sum_{i=1}^{n=3} \displaystyle\sum_{j=1}^{m=4} Cost_{ij} x_{ij} + 100y_{ij}$
+
+where $y_{ij}$ is a binary decision variable whether edge $x_{ij}$ has been used or not and adds the additional cost respectively.
+
+With these fixed costs, the cheapest price for the transportation of all goods to the requested destinations is 1060€
+
+# Exercise 2.5
+## Exercise 2.5.a
+
+Text here
+
+```{r}
+#code here
+```
+
+## Exercise 2.5.b
+
+Text here
+
+```{r}
+#code here
+```
